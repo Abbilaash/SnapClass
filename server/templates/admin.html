@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <h1>Admin Panel - Add Question</h1>
+    <form method="POST">
+      <input name="question" placeholder="Question" required /><br />
+      <input name="option1" placeholder="Option 1" required /><br />
+      <input name="option2" placeholder="Option 2" required /><br />
+      <input name="option3" placeholder="Option 3" required /><br />
+      <input name="option4" placeholder="Option 4" required /><br />
+      <input name="answer" placeholder="Correct Option (1-4)" required /><br />
+      <button type="submit">Add Question</button>
+    </form>
+    <h2>Current Questions:</h2>
+    <ul>
+      {% for q in questions %}
+      <li>{{ q.question }}</li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>
