@@ -4,6 +4,7 @@ import os
 from werkzeug.utils import secure_filename
 import utils
 from pdf_reader import PDFTextImageExtractor
+from pdf2image import convert_from_path
 
 app = Flask(__name__)
 
@@ -25,12 +26,24 @@ def admin():
                 
                 try:
                     extractor = PDFTextImageExtractor()
-                    pdf_content = extractor.extract_full_content(pdf_path)
+                    
+                    # Get total pages for progress tracking
+                    pages = convert_from_path(pdf_path, poppler_path="../venv/Lib/poppler/Library/bin")
+                    total_pages = len(pages)
+                    
+                    # Process the PDF with status updates
+                    updates = []
+                    def status_callback(message):
+                        updates.append(message)
+                    
+                    pdf_content = extractor.extract_full_content(pdf_path, status_callback=status_callback)
                     report_path = os.path.join(app.config['UPLOAD_FOLDER'], 'pdf_analysis.md')
                     extractor.save_to_markdown(pdf_content, report_path)
+                    
                     return jsonify({
                         'success': True,
-                        'message': 'PDF processed successfully',
+                        'message': f'PDF processed successfully ({total_pages} pages)',
+                        'updates': updates,
                         'report_path': report_path
                     })
                 except Exception as e:

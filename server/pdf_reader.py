@@ -33,13 +33,19 @@ class PDFTextImageExtractor:
         # Configure Tesseract OCR (fallback for pure text pages)
         pytesseract.pytesseract.tesseract_cmd = r'/usr/bin/tesseract'  # Update path as needed
 
-    def extract_full_content(self, pdf_path, output_dir="output"):
+    def extract_full_content(self, pdf_path, output_dir="output", status_callback=None):
         """Extract all text and image descriptions from PDF"""
         os.makedirs(output_dir, exist_ok=True)
         
         # Convert PDF to images
         poppler_path = "../venv/Lib/poppler/Library/bin"  # Update if needed
         pages = convert_from_path(pdf_path, poppler_path=poppler_path)
+        
+        if status_callback:
+            status_callback({
+                'type': 'status',
+                'message': f"PDF loaded successfully. Total pages: {len(pages)}"
+            })
         
         full_content = {
             'metadata': {
@@ -50,10 +56,41 @@ class PDFTextImageExtractor:
         }
 
         for page_num, page_image in enumerate(pages, start=1):
+            if status_callback:
+                status_callback({
+                    'type': 'status',
+                    'message': f"Processing page {page_num}/{len(pages)}..."
+                })
+            
             page_content = self._process_page(page_image, page_num, output_dir)
             full_content['pages'].append(page_content)
             
-            print(f"Processed page {page_num}/{len(pages)} - {len(page_content['text'])} chars, {len(page_content['images'])} images")
+            # Send the actual content for this page
+            if status_callback:
+                content_message = f"Page {page_num} Content:\n\n"
+                content_message += f"Text:\n{page_content['text']}\n\n"
+                
+                if page_content['images']:
+                    content_message += "Images Found:\n"
+                    for img in page_content['images']:
+                        content_message += f"- {img['description']['general_description']}\n"
+                        content_message += f"  Educational Context: {img['description']['detailed_description']}\n"
+                
+                status_callback({
+                    'type': 'content',
+                    'content': content_message
+                })
+                
+                status_callback({
+                    'type': 'status',
+                    'message': f"Page {page_num} processed - {len(page_content['text'])} chars, {len(page_content['images'])} images"
+                })
+
+        if status_callback:
+            status_callback({
+                'type': 'status',
+                'message': "PDF processing completed successfully!"
+            })
 
         return full_content
 
@@ -77,7 +114,7 @@ class PDFTextImageExtractor:
             print(f"Nougat failed on page {page_num}, using OCR fallback: {str(e)}")
             page_result['text'] = self._extract_with_ocr(page_image)
 
-        # Extract and describe images (using BLIP base)
+        # Extract and describe images
         page_result['images'] = self._extract_and_describe_images(page_image, page_num, output_dir)
 
         os.remove(img_path)

@@ -28,9 +28,58 @@
         background-color: #6366f1;
         color: #fff;
       }
+      /* Loading overlay styles */
+      .loading-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(5px);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+      }
+      .loading-popup {
+        background: white;
+        padding: 2rem;
+        border-radius: 1rem;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        max-width: 400px;
+        width: 90%;
+      }
+      .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #6366f1;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
     </style>
   </head>
   <body>
+    <!-- Loading overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+      <div class="loading-popup">
+        <div class="loading-spinner"></div>
+        <h4 class="text-primary mb-2">Please wait...</h4>
+        <p class="text-muted">SnapClass reading through your content...</p>
+      </div>
+    </div>
+
     <div class="container py-5">
       <ul class="nav nav-tabs mb-4" id="adminTab" role="tablist">
         <li class="nav-item" role="presentation">
@@ -69,7 +118,7 @@
                 <form
                   method="POST"
                   enctype="multipart/form-data"
-                  action="/dashboard"
+                  action="/admin"
                 >
                   <div class="mb-3">
                     <label class="form-label">Upload Audio:</label>
@@ -85,6 +134,21 @@
                     </button>
                   </div>
                 </form>
+                <!-- Add status display area -->
+                <div id="trainingStatus" class="mt-4" style="display: none">
+                  <h4 class="text-secondary mb-3">Live Content Extraction:</h4>
+                  <div
+                    id="statusContent"
+                    style="
+                      font-family: 'Courier New', monospace;
+                      background-color: #f8f9fa;
+                      padding: 15px;
+                      border-radius: 8px;
+                      max-height: 500px;
+                      overflow-y: auto;
+                    "
+                  ></div>
+                </div>
               </div>
             </div>
           </div>
@@ -114,8 +178,81 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+      // Add this new function for handling training updates
+      function updateTrainingStatus(message, isContent = false) {
+        const statusDiv = document.getElementById("trainingStatus");
+        const statusContent = document.getElementById("statusContent");
+
+        statusDiv.style.display = "block";
+        const timestamp = new Date().toLocaleTimeString();
+
+        if (isContent) {
+          // For actual content, create a formatted display
+          const contentDiv = document.createElement("div");
+          contentDiv.className = "mb-4 p-3 border rounded";
+          contentDiv.innerHTML = `
+            <div class="text-primary mb-2">[${timestamp}] Page Content:</div>
+            <div class="text-dark">${message}</div>
+          `;
+          statusContent.appendChild(contentDiv);
+        } else {
+          // For status updates
+          const statusDiv = document.createElement("div");
+          statusDiv.className = "text-muted mb-2";
+          statusDiv.innerHTML = `[${timestamp}] ${message}`;
+          statusContent.appendChild(statusDiv);
+        }
+
+        statusContent.scrollTop = statusContent.scrollHeight;
+      }
+
+      // Add loading overlay functions
+      function showLoading() {
+        document.getElementById("loadingOverlay").style.display = "flex";
+      }
+
+      function hideLoading() {
+        document.getElementById("loadingOverlay").style.display = "none";
+      }
+
+      // Modify the form submission to handle file upload with status updates
+      document.querySelector("form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+
+        try {
+          showLoading();
+          const response = await fetch("/admin", {
+            method: "POST",
+            body: formData,
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            updateTrainingStatus(result.message);
+            if (result.updates) {
+              result.updates.forEach((update) => {
+                if (update.type === "content") {
+                  updateTrainingStatus(update.content, true);
+                } else {
+                  updateTrainingStatus(update.message);
+                }
+              });
+            }
+          } else {
+            updateTrainingStatus(`Error: ${result.message}`);
+          }
+        } catch (error) {
+          updateTrainingStatus(`Error: ${error.message}`);
+        } finally {
+          hideLoading();
+        }
+      });
+
+      // Keep existing loadAnalysis function
       function loadAnalysis() {
-        fetch("/dashboard")
+        fetch("/admin")
           .then((res) => res.text())
           .then((html) => {
             // Extract the JSON data from the dashboard page
