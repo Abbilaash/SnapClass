@@ -4,11 +4,16 @@ body {
     background-color: #f4f4f4;
 }
 
-h1 {
+h1, h2 {
     color: #333;
 }
 
 input, button {
     margin: 5px;
     padding: 10px;
+    display: block;
+}
+
+form {
+    margin-bottom: 30px;
 }

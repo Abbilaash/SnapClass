@@ -1,41 +1,121 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>Student Test</title>
-    <link rel="stylesheet" href="/static/style.css">
-</head>
-<body>
-    <h1>Student Test</h1>
-    <form id="quizForm">
-        {% for q in questions %}
-            <div>
-                <p><strong>{{ loop.index }}. {{ q.question }}</strong></p>
-                {% for option in q.options %}
-                    <label><input type="radio" name="q{{ loop.index0 }}" value="{{ loop.index }}"> {{ option }}</label><br>
-                {% endfor %}
+    <!-- Bootstrap 5 CDN -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+        min-height: 100vh;
+      }
+      .card {
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        border-radius: 1rem;
+      }
+      .form-check-input:checked {
+        background-color: #6366f1;
+        border-color: #6366f1;
+      }
+      .question-block {
+        margin-bottom: 2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container py-5">
+      <div class="row justify-content-center">
+        <div class="col-md-8">
+          <div class="card p-4">
+            <h1 class="mb-4 text-center text-primary">Student Test</h1>
+            <div id="nameSection">
+              <form id="nameForm">
+                <div class="mb-3">
+                  <label for="studentName" class="form-label"
+                    >Enter your name to start:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="studentName"
+                    required
+                  />
+                </div>
+                <div class="d-grid">
+                  <button type="submit" class="btn btn-primary">
+                    Start Test
+                  </button>
+                </div>
+              </form>
             </div>
-        {% endfor %}
-        <button type="submit">Submit</button>
-    </form>
-    <div id="result"></div>
+            <form id="quizForm" style="display: none">
+              {% for q in questions %}
+              <div class="question-block">
+                <p class="fw-bold">{{ loop.index }}. {{ q.question }}</p>
+                <div class="ms-3">
+                  {% for option in q.options %}
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="q{{ loop.index0 }}"
+                      value="{{ loop.index }}"
+                      id="q{{ loop.index0 }}_{{ loop.index }}"
+                      required
+                    />
+                    <label
+                      class="form-check-label"
+                      for="q{{ loop.index0 }}_{{ loop.index }}"
+                      >{{ option }}</label
+                    >
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+              {% endfor %}
+              <div class="d-grid">
+                <button type="submit" class="btn btn-success">Submit</button>
+              </div>
+            </form>
+            <div id="result" class="mt-4 text-center fs-4"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.getElementById("quizForm").onsubmit = async function(e) {
-            e.preventDefault();
-            const answers = [];
-            const form = e.target;
-            for (let i = 0; i < form.length; i++) {
-                if (form[i].type === "radio" && form[i].checked) {
-                    answers.push(form[i].value);
-                }
-            }
-            const res = await fetch("/submit", {
-                method: "POST",
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ answers })
-            });
-            const data = await res.json();
-            document.getElementById("result").innerText = `Score: ${data.score}/${data.total}`;
+      let studentName = "";
+      document.getElementById("nameForm").onsubmit = function (e) {
+        e.preventDefault();
+        studentName = document.getElementById("studentName").value.trim();
+        if (studentName) {
+          document.getElementById("nameSection").style.display = "none";
+          document.getElementById("quizForm").style.display = "block";
         }
+      };
+      document.getElementById("quizForm").onsubmit = async function (e) {
+        e.preventDefault();
+        const answers = [];
+        const form = e.target;
+        for (let i = 0; i < form.length; i++) {
+          if (form[i].type === "radio" && form[i].checked) {
+            answers.push(form[i].value);
+          }
+        }
+        const res = await fetch("/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: studentName, answers }),
+        });
+        const data = await res.json();
+        document.getElementById(
+          "result"
+        ).innerText = `Score: ${data.score}/${data.total}`;
+      };
     </script>
-</body>
+  </body>
 </html>
