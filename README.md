@@ -1,11 +1,8 @@
 # SnapClass
 AI-powered offline classroom assistant for under-resourced schools. Real-time speech-to-text, textbook parsing, quiz generation, and analytics—all on-device, no internet required. Empowers teachers with personalized insights and students with interactive learning via local WiFi access point.
 
-## Technologies used
-### Backend and Server
-- Python 3
-- Flask web backend
-- Dead Networks
+## App architecture
+![Snapclass](https://github.com/user-attachments/assets/ac08564f-5530-4e68-8d1f-83d595009ebf)
 
 ### Models
 - **Whisper-small (242M params)** via "openai/whisper-small"
@@ -14,13 +11,13 @@ AI-powered offline classroom assistant for under-resourced schools. Real-time sp
 - **Phi-3.5-mini-instruct (3.82B params)** via "AnythingLLM" running locally via ONNX accelerated by Snapdragon's X Elite's NPU
 
 ## Features
-- 🖼️ Teacher dashboard with file upload and analytics view  
-- 📄 Lecture and textbook PDF/audio upload  
-- 🤖 AI-based question and answer evaluation  
-- 📊 Graph-based performance analysis  
-- ❌ Identifies weak syllabus topics per student or group  
-- 🌐 Fully functional offline – no internet needed  
-- 🎯 Lightweight and fast inference using sentence embeddings
+- 🖼Teacher dashboard with file upload and analytics view  
+- Lecture and textbook PDF/audio upload  
+- AI-based question and answer evaluation
+- Uses Both CPU and NPU for faster on-device processing
+- Identifies weak syllabus topics per student or group  
+- Fully functional offline – no internet needed  
+- Lightweight and fast inference using sentence embeddings
 
 ## Setup & Usage
 ### Step 1: Setup Local Hotspot (No Internet)
@@ -56,6 +53,12 @@ Use the IP address shown in MyPublicWifi ad access the students portal
 - Student Test Page
 ```http://<IP>:5000/test```
 Replace <IP> with the one shown in the MyPublicWifi app after enabling the hotspot
+
+## Screenshots
+![image](https://github.com/user-attachments/assets/2f0fbba2-778e-490e-9729-7f1ab84d76c3)
+![image](https://github.com/user-attachments/assets/62445589-c787-4bc3-8acb-37f5ef56ddb2)
+![image](https://github.com/user-attachments/assets/352be7fd-1a9b-4709-97a6-7c6561eddf70)
+![image](https://github.com/user-attachments/assets/9de25358-9031-4660-be61-b9d5e269e2fd)
 
 ## Authors
 [A T Abbilaash](https://github.com/Abbilaash)
