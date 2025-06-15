@@ -37,8 +37,8 @@ class PDFTextImageExtractor:
         """Extract all text and image descriptions from PDF"""
         os.makedirs(output_dir, exist_ok=True)
         
-        # Convert PDF to images
-        poppler_path = "../venv/Lib/poppler/Library/bin"  # Update if needed
+        # Set poppler_path to the local poppler directory
+        poppler_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "poppler", "Library", "bin")
         pages = convert_from_path(pdf_path, poppler_path=poppler_path)
         
         if status_callback:

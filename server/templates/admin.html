@@ -149,6 +149,57 @@
                     "
                   ></div>
                 </div>
+                <div id="outputSection" class="mt-4" style="display:none;">
+                  <h4 class="text-success mb-2">Extracted Content</h4>
+                  <div class="mb-3">
+                    <label class="form-label fw-bold">Audio Transcription:</label>
+                    <pre
+                      id="audioOutput"
+                      style="
+                        background: #f8f9fa;
+                        padding: 10px;
+                        border-radius: 8px;
+                        max-height: 200px;
+                        overflow-y: auto;
+                      "
+                    ></pre>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label fw-bold">PDF Extraction:</label>
+                    <pre
+                      id="pdfOutput"
+                      style="
+                        background: #f8f9fa;
+                        padding: 10px;
+                        border-radius: 8px;
+                        max-height: 200px;
+                        overflow-y: auto;
+                      "
+                    ></pre>
+                  </div>
+                </div>
+                <div class="d-grid">
+                  <button
+                    id="generateQuestionsBtn"
+                    class="btn btn-primary"
+                    style="display:none;"
+                  >
+                    Generate Questions
+                  </button>
+                </div>
+                <div id="questionsSection" class="mt-4" style="display:none;">
+                  <h5 class="text-info mb-3">Generated Questions</h5>
+                  <ul id="questionsList" class="list-group"></ul>
+                  <div class="d-grid mt-3">
+                    <button
+                      id="publishTestBtn"
+                      class="btn btn-success"
+                      style="display:none;"
+                    >
+                      Publish Test
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -240,6 +291,11 @@
                 }
               });
             }
+            // Show output texts
+            document.getElementById("outputSection").style.display = "block";
+            document.getElementById("audioOutput").textContent = result.audio_text || "";
+            document.getElementById("pdfOutput").textContent = result.pdf_text || "";
+            document.getElementById("generateQuestionsBtn").style.display = "block";
           } else {
             updateTrainingStatus(`Error: ${result.message}`);
           }
@@ -252,25 +308,65 @@
 
       // Keep existing loadAnalysis function
       function loadAnalysis() {
-        fetch("/admin")
-          .then((res) => res.text())
-          .then((html) => {
-            // Extract the JSON data from the dashboard page
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, "text/html");
-            const pre = doc.querySelector("pre");
-            const data = pre
-              ? pre.textContent
-              : "No student data available yet.";
-            document.getElementById(
-              "analysisContent"
-            ).innerHTML = `<pre>${data}</pre>`;
-          });
+        window.open("/analyse", "_blank");
       }
+
       // Auto-load analysis when tab is shown
       document
         .getElementById("analysis-tab")
         .addEventListener("shown.bs.tab", loadAnalysis);
+
+      document.getElementById("generateQuestionsBtn").addEventListener("click", async () => {
+        showLoading();
+        updateTrainingStatus("Generating questions from extracted content...");
+        try {
+          const response = await fetch("/generate_questions", {
+            method: "POST"
+          });
+          const result = await response.json();
+          if (result.success) {
+            updateTrainingStatus("Questions generated successfully!");
+            const questionsSection = document.getElementById("questionsSection");
+            const questionsList = document.getElementById("questionsList");
+            questionsList.innerHTML = "";
+            result.questions.forEach((q, idx) => {
+              const li = document.createElement("li");
+              li.className = "list-group-item";
+              li.textContent = q;
+              questionsList.appendChild(li);
+            });
+            questionsSection.style.display = "block";
+            // Show the publish button
+            document.getElementById("publishTestBtn").style.display = "block";
+          } else {
+            updateTrainingStatus(`Error: ${result.message}`);
+          }
+        } catch (error) {
+          updateTrainingStatus(`Error: ${error.message}`);
+        } finally {
+          hideLoading();
+        }
+      });
+
+      document.getElementById("publishTestBtn").addEventListener("click", async () => {
+        showLoading();
+        updateTrainingStatus("Publishing test for students...");
+        try {
+          const response = await fetch("/publish_test", {
+            method: "POST"
+          });
+          const result = await response.json();
+          if (result.success) {
+            updateTrainingStatus("Test published! Students can now access the test.");
+          } else {
+            updateTrainingStatus(`Error: ${result.message}`);
+          }
+        } catch (error) {
+          updateTrainingStatus(`Error: ${error.message}`);
+        } finally {
+          hideLoading();
+        }
+      });
     </script>
   </body>
 </html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Test Analysis Report</title>
+    <!-- Bootstrap 5 CDN -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+      }
+      .card {
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        border-radius: 1rem;
+        margin-bottom: 2rem;
+      }
+      .table {
+        margin-bottom: 0;
+      }
+      .table td {
+        vertical-align: middle;
+      }
+      .question-answer {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        margin-bottom: 0.5rem;
+      }
+      .question-answer:last-child {
+        margin-bottom: 0;
+      }
+      .ai-analysis {
+        white-space: pre-wrap;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-10">
+          <!-- AI Analysis Section -->
+          <div class="card p-4">
+            <h2 class="mb-4 text-center text-primary">AI Analysis Report</h2>
+            {% if data.ai_analysis %}
+            <div class="ai-analysis">
+              {{ data.ai_analysis | safe }}
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+              No AI analysis available.
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Submissions Section -->
+          <div class="card p-4">
+            <h2 class="mb-4 text-center text-primary">Student Submissions</h2>
+            
+            {% if error %}
+            <div class="alert alert-danger">
+              Error: {{ error }}
+            </div>
+            {% else %}
+            <div class="mb-4">
+              <h4>Total Submissions: {{ data.total_submissions }}</h4>
+            </div>
+
+            {% if data.submissions %}
+            <div class="table-responsive">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Student Name</th>
+                    <th>Timestamp</th>
+                    <th>Questions & Answers</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for submission in data.submissions %}
+                  <tr>
+                    <td>{{ submission.student_name }}</td>
+                    <td>{{ submission.timestamp }}</td>
+                    <td>
+                      {% for qa in submission.questions_and_answers %}
+                      <div class="question-answer">
+                        <strong>Q:</strong> {{ qa.question }}<br>
+                        <strong>A:</strong> {{ qa.answer }}
+                      </div>
+                      {% endfor %}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+              No submissions available yet.
+            </div>
+            {% endif %}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html> 

@@ -1,0 +1,5 @@
+api_key: "XFYZVMS-A104XCX-NWBD883-D48QQ1H"
+model_server_base_url: "http://localhost:3001/api/v1"
+workspace_slug: "my-workspace"
+stream: true
+stream_timeout: 60

@@ -16,12 +16,16 @@
         box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
         border-radius: 1rem;
       }
-      .form-check-input:checked {
-        background-color: #6366f1;
-        border-color: #6366f1;
+      .form-control,
+      .btn {
+        border-radius: 0.5rem;
       }
       .question-block {
         margin-bottom: 2rem;
+      }
+      .question-label {
+        font-weight: 600;
+        color: #3730a3;
       }
     </style>
   </head>
@@ -54,26 +58,17 @@
             <form id="quizForm" style="display: none">
               {% for q in questions %}
               <div class="question-block">
-                <p class="fw-bold">{{ loop.index }}. {{ q.question }}</p>
-                <div class="ms-3">
-                  {% for option in q.options %}
-                  <div class="form-check">
-                    <input
-                      class="form-check-input"
-                      type="radio"
-                      name="q{{ loop.index0 }}"
-                      value="{{ loop.index }}"
-                      id="q{{ loop.index0 }}_{{ loop.index }}"
-                      required
-                    />
-                    <label
-                      class="form-check-label"
-                      for="q{{ loop.index0 }}_{{ loop.index }}"
-                      >{{ option }}</label
-                    >
-                  </div>
-                  {% endfor %}
-                </div>
+                <label class="question-label" for="q{{ loop.index0 }}">
+                  {{ loop.index }}. {{ q }}
+                </label>
+                <textarea
+                  class="form-control mt-2"
+                  id="q{{ loop.index0 }}"
+                  name="q{{ loop.index0 }}"
+                  rows="3"
+                  required
+                  placeholder="Type your answer here..."
+                ></textarea>
               </div>
               {% endfor %}
               <div class="d-grid">
@@ -101,9 +96,10 @@
         e.preventDefault();
         const answers = [];
         const form = e.target;
-        for (let i = 0; i < form.length; i++) {
-          if (form[i].type === "radio" && form[i].checked) {
-            answers.push(form[i].value);
+        for (let i = 0; i < form.elements.length; i++) {
+          const el = form.elements[i];
+          if (el.tagName === "TEXTAREA") {
+            answers.push(el.value.trim());
           }
         }
         const res = await fetch("/submit", {
@@ -114,7 +110,8 @@
         const data = await res.json();
         document.getElementById(
           "result"
-        ).innerText = `Score: ${data.score}/${data.total}`;
+        ).innerText = `Your answers have been submitted.`;
+        form.style.display = "none";
       };
     </script>
   </body>
