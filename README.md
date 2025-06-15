@@ -1,5 +1,5 @@
 # SnapClass
-AI-powered offline classroom assistant for under-resourced schools. Real-time speech-to-text, textbook parsing, quiz generation, and analytics—all on-device, no internet required. Empowers teachers with personalized insights and students with interactive learning via local WiFi access point.
+SnapClass is an on-device edge AI system for zero-internet, crowded classrooms, leveraging Snapdragon's Hexagon NPU to run open-source LLMs , image captioning , and audio transcription - automating personalized learning by transcribing lectures, analyzing textbooks, and generating adaptive quizzes to bridge educational gaps where teachers and connectivity are limited.
 
 ## App architecture
 ![Snapclass](https://github.com/user-attachments/assets/ac08564f-5530-4e68-8d1f-83d595009ebf)
@@ -38,6 +38,10 @@ cd SnapClass
 ```
 pip install -r requirements.txt
 ```
+Install [AnythingLLM](https://anythingllm.com/) and activate AnythingLLM NPU to process LLM models in Qualcomm Hexagon NPU.
+Download ```Phi 3.5 Mini Instruct 4K 2.00GB``` model.
+Get you AnythingLLM Developer API from Settings>Tools>Developer API>Generate New API Key and get you workspace slug.
+Replace you API key in ```server/config.yaml``` as ```api_key: <API>``` and ```workspace_slug: <my-workspace>```
 
 ### Step 3: Start the server
 ```
@@ -61,5 +65,6 @@ Replace <IP> with the one shown in the MyPublicWifi app after enabling the hotsp
 ![image](https://github.com/user-attachments/assets/9de25358-9031-4660-be61-b9d5e269e2fd)
 
 ## Authors
-[A T Abbilaash](https://github.com/Abbilaash)
-[Nivashini N](https://github.com/nivashini2505)
+[A T Abbilaash](https://github.com/Abbilaash) - 23n201@psgtech.ac.in 
+<br/>
+[Nivashini N](https://github.com/nivashini2505) - 23n234@psgtech.ac.in
