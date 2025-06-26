@@ -1,5 +1,5 @@
 # SnapClass
-SnapClass is an on-device edge AI system for zero-internet, crowded classrooms, leveraging Snapdragon's Hexagon NPU to run open-source LLMs , image captioning , and audio transcription - automating personalized learning by transcribing lectures, analyzing textbooks, and generating adaptive quizzes to bridge educational gaps where teachers and connectivity are limited.
+SnapClass is an advanced on-device edge AI solution designed for low-connectivity, high-density classroom environments. Powered by Snapdragon’s Hexagon NPU, it runs open-source large language models (LLMs), image captioning, and audio transcription entirely offline. SnapClass automates personalized learning by transcribing lectures, analyzing textbook content, and generating adaptive quizzes—bridging educational gaps in underserved regions where internet access and qualified educators are limited.
 
 ## App architecture
 ![Snapclass](https://github.com/user-attachments/assets/ac08564f-5530-4e68-8d1f-83d595009ebf)
